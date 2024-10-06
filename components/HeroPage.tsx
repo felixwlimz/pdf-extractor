@@ -3,6 +3,7 @@ import { FileUp } from "lucide-react";
 import { ChangeEvent, DragEvent, useEffect, useState } from "react";
 import { Button } from "./ui/button";
 import { Input } from "./ui/input";
+import { cn } from "@/lib/utils";
 
 const HeroPage = () => {
   const [pdfFiles, setPdfFiles] = useState<File[]>([]);
@@ -39,8 +40,9 @@ const HeroPage = () => {
         Drag and drop of a whole set for easy extraction
       </p>
       <div
-        className="relative flex items-center rounded-lg border border-dashed left-0
-       border-orange-500 justify-center w-[640px] lg:min-w-[1140px] h-[275px] lg:min-h-[380px] p-3"
+        className={cn('relative flex rounded-lg border border-dashed left-0 border-orange-500 w-[640px] lg:min-w-[1140px] h-[275px] lg:min-h-[380px] p-3', 
+          pdfFiles.length === 0 ? 'items-center justify-center' : ''
+        )}
       >
         {pdfFiles.length === 0 && (
           <div className="absolute flex flex-col gap-3 items-center h-full justify-center">
