@@ -15,15 +15,24 @@ const Navbar = async () => {
           <FileText /> <span>PDFExtractor</span>
         </h3>
         <div className="flex gap-4 items-center">
-          <Bell />
           {!user ? (
-            <Link href="/sign-in">
-              <Button className="font-semibold text-xl bg-orange-400 hover:bg-orange-500">
-                Log In
-              </Button>
-            </Link>
+            <>
+              <Link href="/sign-in">
+                <Button className="font-semibold text-lg bg-orange-500 hover:bg-orange-600">
+                  Log In
+                </Button>
+              </Link>
+              <Link href="/sign-up">
+                <Button variant='outline' className="font-semibold border border-orange-500 text-lg hover:bg-orange-600 hover:text-white">
+                  Sign Up
+                </Button>
+              </Link>
+            </>
           ) : (
-            <UserButton />
+            <>
+              <Bell />
+              <UserButton />
+            </>
           )}
         </div>
       </div>

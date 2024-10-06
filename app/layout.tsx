@@ -1,17 +1,18 @@
 import type { Metadata } from "next";
 import "./globals.css";
 import { ClerkProvider } from "@clerk/nextjs";
-import { Roboto } from 'next/font/google'
+import { Poppins } from "next/font/google";
 
 export const metadata: Metadata = {
   title: "PDF Extractor",
   description: "Extract your PDF files",
 };
 
-const roboto = Roboto({
-  weight : ['400', '700'],
-  subsets : ['latin']
-})
+const poppins = Poppins({
+  subsets: ["latin"],
+  display: "swap",
+  weight: ["400", "500"],
+});
 
 export default function RootLayout({
   children,
@@ -19,11 +20,16 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <ClerkProvider>
-      <html lang="en" className={roboto.className}>
-        <body>
-         {children}
-        </body>
+    <ClerkProvider
+      appearance={{
+        elements: {
+          formButtonPrimary:
+            "bg-orange-500 hover:bg-orange-600 text-lg border-none",
+        },
+      }}
+    >
+      <html lang="en">
+        <body className={poppins.className}>{children}</body>
       </html>
     </ClerkProvider>
   );
