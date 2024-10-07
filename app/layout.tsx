@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import "./globals.css";
 import { ClerkProvider } from "@clerk/nextjs";
 import { Poppins } from "next/font/google";
+import { Toaster } from "@/components/ui/toaster";
 
 export const metadata: Metadata = {
   title: "PDF Extractor",
@@ -29,7 +30,10 @@ export default function RootLayout({
       }}
     >
       <html lang="en">
-        <body className={poppins.className}>{children}</body>
+        <body className={poppins.className}>
+          {children}
+          <Toaster/>
+          </body>
       </html>
     </ClerkProvider>
   );
