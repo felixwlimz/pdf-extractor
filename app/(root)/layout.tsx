@@ -4,6 +4,8 @@ import { currentUser } from "@clerk/nextjs/server";
 
 
 
+
+
 export default async function RootLayout({
   children,
 }: Readonly<{
@@ -12,10 +14,11 @@ export default async function RootLayout({
     const user = await currentUser();
 
   return (
-    <main className="m-2 w-full h-screen">
-      <Navbar user={user!}/>
-      {children}
+
+    <div className="flex flex-col min-h-screen">
+      <Navbar />
+      <main className="flex-grow">{children}</main>
       <Footer />
-    </main>
+    </div>
   );
 }
