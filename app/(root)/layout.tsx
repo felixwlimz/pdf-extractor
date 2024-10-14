@@ -1,18 +1,16 @@
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 
-
-
 export default function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
   return (
-    <main className="m-2 w-full">
+    <div className="flex flex-col min-h-screen">
       <Navbar />
-      {children}
+      <main className="flex-grow">{children}</main>
       <Footer />
-    </main>
+    </div>
   );
 }
