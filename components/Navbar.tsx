@@ -14,19 +14,19 @@ const Navbar = ({ user } : { user : User}) => {
         <div className="flex gap-6">
           <Link
             href="/"
-            className="flex gap-2 cursor-pointer font-semibold md:text-lg text-xl text-orange-700"
+            className="flex gap-2 cursor-pointer font-semibold md:text-lg text-xl text-green-600"
           >
             <FileText /> <span>PDFExtractor</span>
           </Link>
           <ul className="flex gap-5 font-semibold text-lg max-[768px]:hidden">
             <li>
-              <Link href="/chat-bot" className="hover:text-orange-700">
+              <Link href="/chat-bot" className="hover:text-green-600">
                 laufey.ai
               </Link>
             </li>
             <li>
-              <Link href="/extract-drive" className="hover:text-orange-700">
-                Extract from Drive
+              <Link href="/extract-file" className="hover:text-green-600">
+                Extract from Files
               </Link>
             </li>
           </ul>
@@ -36,14 +36,14 @@ const Navbar = ({ user } : { user : User}) => {
           {!user ? (
             <>
               <Link href="/sign-in">
-                <Button className="font-semibold text-lg bg-orange-500 hover:bg-orange-600">
+                <Button className="font-semibold text-lg bg-green-400 hover:bg-green-600">
                   Log In
                 </Button>
               </Link>
               <Link href="/sign-up">
                 <Button
                   variant="outline"
-                  className="font-semibold border border-orange-500 text-lg hover:bg-orange-600 hover:text-white"
+                  className="font-semibold border border-green-400 text-lg hover:bg-green-600 hover:text-white"
                 >
                   Sign Up
                 </Button>

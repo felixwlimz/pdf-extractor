@@ -1,4 +1,3 @@
-import ChatNav from "@/components/ChatNav";
 import ChatSidebar from "@/components/ChatSidebar";
 
 const ChatLayout = ({ children } : { children : React.ReactNode }) => {

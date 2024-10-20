@@ -34,14 +34,14 @@ const MobileNavbar = ({ user }: { user: User }) => {
             ) : (
               <>
                 <Link href="/sign-in">
-                  <Button className="font-semibold text-lg bg-orange-500 hover:bg-orange-600">
+                  <Button className="font-semibold text-lg bg-green-400 hover:bg-green-600-600">
                     Log In
                   </Button>
                 </Link>
                 <Link href="/sign-up">
                   <Button
                     variant="outline"
-                    className="font-semibold border border-orange-500 text-lg hover:bg-orange-600 hover:text-white"
+                    className="font-semibold border border-green-400 text-lg hover:bg-green-600-600 hover:text-white"
                   >
                     Sign Up
                   </Button>
@@ -50,12 +50,12 @@ const MobileNavbar = ({ user }: { user: User }) => {
             )}
             <ul className="flex flex-col gap-5 font-semibold text-lg">
               <li>
-                <Link href="/chat-bot" className="hover:text-orange-700 ">
+                <Link href="/chat-bot" className="hover:text-green-600-700 ">
                   laufey.ai
                 </Link>
               </li>
               <li>
-                <Link href="/extract-drive" className="hover:text-orange-700">
+                <Link href="/extract-drive" className="hover:text-green-600-700">
                   Extract from Drive
                 </Link>
               </li>

@@ -1,8 +1,7 @@
-"use client";
-import { ChangeEvent, useRef, useState } from "react";
+ "use client";
+import { ChangeEvent, useState } from "react";
 import { Button } from "./ui/button";
 import { Input } from "./ui/input";
-import { cn } from "@/lib/utils";
 import { UiPathRobot } from "@uipath/robot";
 import { Job } from "@uipath/robot/dist/models";
 
@@ -13,7 +12,7 @@ const HeroPage = () => {
     setFolderLink(e.target.value);
   };
 
-  const google_run = (processName: string, link: string): void => {
+  const automate = (processName: string, link: string): void => {
     const robot = UiPathRobot.init();
     robot.getProcesses().then(
       (processes: Array<{ id: string; name: string }>) => {
@@ -59,25 +58,27 @@ const HeroPage = () => {
   };
 
   return (
-    <section className="flex flex-col items-center justify-center gap-4">
-      <h2 className="text-[36px] font-bold">Extract your PDF files</h2>
+    <section className="flex flex-col items-center justify-center gap-8">
+      <h2 className="text-[36px] font-bold text-green-600">
+        Extract your PDF files
+      </h2>
       <p className="font-md text-lg">
         Enter your Google Drive folder link for extraction
       </p>
-      
+
       <Input
         type="text"
         placeholder="Enter Google Drive folder link"
         value={folderLink}
         onChange={handleLinkChange}
-        className="w-full max-w-md"
+        className="w-[1140px] max-md:max-w-xl border border-green-300"
       />
 
       <div className="flex gap-2">
         <Button
-          className="bg-orange-500 hover:bg-orange-600 font-semibold"
+          className="bg-green-400 hover:bg-green-600 font-semibold"
           type="button"
-          onClick={() => google_run("Upload_Run", folderLink)}
+          onClick={() => automate("Upload_Run", folderLink)}
         >
           Extract PDFs
         </Button>
