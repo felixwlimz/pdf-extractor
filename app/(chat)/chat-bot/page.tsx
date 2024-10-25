@@ -1,28 +1,86 @@
-'use client'
-import ChatForm from '@/components/ChatForm';
-import ChatNav from '@/components/ChatNav';
-import { createChat } from '@/lib/gemini';
-import { useState } from 'react'
+"use client";
+import ChatNav from "@/components/ChatNav";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import model from "@/lib/gemini/config";
+import { Content } from "@google/generative-ai";
+import { Plus, Send } from "lucide-react";
+import { useState } from "react";
 
 const ChatBotPage = () => {
+  const [message, setMessage] = useState("");
+  const [history, setHistory] = useState<Content[]>([]);
 
-  const [chat, setChat] = useState('')
-  const [messages, setMessages] = useState([])
   const sendMessage = async () => {
-     const message = await createChat(chat)
-     
-     console.log(message)
-  }
+    if (!message.trim()) return; 
+
+    setHistory((oldHistory) => [
+      ...oldHistory,
+      {
+        role: "user",
+        parts: [{ text: message }],
+      },
+    ]);
+
+    try {
+      const chat = model.startChat({
+        history: [...history, { role: "user", parts: [{ text: message }] }],
+      });
+
+      const result = await chat.sendMessage(message);
+      const text = result.response.text(); 
+
+      setHistory((oldHistory) => [
+        ...oldHistory,
+        {
+          role: "model",
+          parts: [{ text }],
+        },
+      ]);
+    } catch (error) {
+      console.log(error);
+    } finally {
+      setMessage(""); 
+    }
+  };
 
   return (
     <section className="flex flex-col justify-between p-4">
       <ChatNav />
-      <div className='w-fit'>
-         
+      <div className="flex-grow overflow-y-auto p-4 bg-gray-100 h-full">
+        {history.map((content, index) => (
+          <p key={index}>
+            {content.role === "user"
+              ? content.parts[0].text
+              : content.parts[0].text}
+          </p>
+        ))}
       </div>
-      <ChatForm chat={chat} setChat={setChat} onClick={sendMessage}/>
+      <div className="w-full p-2 flex gap-5 items-center">
+        <Button
+          type="button"
+          className="rounded-[50px] bg-green-400 hover:bg-green-600 p-2"
+        >
+          <Plus />
+        </Button>
+        <Input
+          type="text"
+          value={message}
+          onChange={(e) => setMessage(e.target.value)}
+          className="border border-green-500"
+          placeholder="Type 'From the Start' or Something you would like...."
+          onKeyDown={(e) => e.key === "Enter" && sendMessage()}
+        />
+        <Button
+          onClick={sendMessage}
+          type="button"
+          className="rounded-[50px] bg-green-400 hover:bg-green-600 p-2"
+        >
+          <Send />
+        </Button>
+      </div>
     </section>
   );
-}
+};
 
-export default ChatBotPage
+export default ChatBotPage;
