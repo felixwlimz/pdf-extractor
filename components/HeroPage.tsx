@@ -3,106 +3,100 @@ import { ChangeEvent, useState } from "react";
 import { Button } from "./ui/button";
 import { Input } from "./ui/input";
 import { UiPathRobot } from "@uipath/robot";
-import { Job } from "@uipath/robot/dist/models";
+import { Job, RobotProcess, JobPromise} from "@uipath/robot/dist/models";
+
+
+const Spinner = () => (
+  <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-green-600"></div>
+);
 
 const HeroPage = () => {
+  const robot = UiPathRobot.init();
   const [folderLink, setFolderLink] = useState<string>("");
+  const [logs, setLogs] = useState<string[]>([]);
+  const [loading, setLoading] = useState<boolean>(false);
+  const [successMessageVisible, setSuccessMessageVisible] = useState<boolean>(false);
+  const [robotProcess, setRobotProcess] = useState<RobotProcess | null>(null); // State for storing robot process
 
   const handleLinkChange = (e: ChangeEvent<HTMLInputElement>) => {
     setFolderLink(e.target.value);
   };
 
-  const automate_summary = (processName: string, link: string, combine: boolean): void => {
-    const robot = UiPathRobot.init();
-    robot.getProcesses().then(
-      (processes: Array<{ id: string; name: string }>) => {
-        if (processes.length === 0) {
-          alert("Robot not connected to Orchestrator or no processes are available");
-          return;
-        }
-
-        const process = processes.find((p) => p.name.includes(processName));
-
-        if (!process) {
-          alert(`No process found with name containing: ${processName}`);
-          return;
-        }
-        // Assuming 'link' is a string variable containing the drive link
-        const test = link; // link should already be a string
-
-        // Define the Arguments interface
-        interface Arguments {
-          drive_link_in: string; // The drive link is expected to be a string
-          combine: boolean;
-        }
-
-        // Create the arguments object
-        const args: Arguments = {
-          drive_link_in: test, // Use the drive_link_in variable directly
-          combine: combine
-          
-        };
-
-        // Assuming process.id is defined and valid
-        const job = new Job(process.id, args);
-        robot.startJob(job).then(
-          (result) => {
-            alert("The summary is sent to your email");
-          },
-          (err) => {
-            alert("Job Failed! " + err);
-          }
-        );
-      },
-      (err) => {
-        alert("Error! " + err);
-      }
-    );
+  const addLog = (message: string) => {
+    setLogs((prevLogs) => [...prevLogs, message]);
   };
 
-  const automate_extract = (processName: string, link: string): void => {
-    const robot = UiPathRobot.init();
+  const clearLogs = () => {
+    setLogs([]);
+  };
+
+  const stopJob = () => {
+    if (robotProcess) {
+      robot.stopProcess(robotProcess); // Stop the robot process
+      addLog("Job has been stopped.");
+    }
+    setLoading(false);
+  };
+
+  const automate_summary = (processName: string, link: string, combine?: boolean): void => {
+    clearLogs();
+    setLoading(true);
+    setSuccessMessageVisible(false);
     robot.getProcesses().then(
       (processes: Array<{ id: string; name: string }>) => {
         if (processes.length === 0) {
           alert("Robot not connected to Orchestrator or no processes are available");
+          setLoading(false);
           return;
         }
 
         const process = processes.find((p) => p.name.includes(processName));
-
+        
         if (!process) {
           alert(`No process found with name containing: ${processName}`);
+          setLoading(false);
           return;
         }
-        // Assuming 'link' is a string variable containing the drive link
-        const test = link; // link should already be a string
 
-        // Define the Arguments interface
+        const newRobotProcess = new RobotProcess(process.id, processName); // Create the RobotProcess
+        setRobotProcess(newRobotProcess); // Store the robotProcess in state
+
         interface Arguments {
-          drive_link_in: string; // The drive link is expected to be a string
+          drive_link_in: string;
+          combine?: boolean;
         }
 
-        // Create the arguments object
         const args: Arguments = {
-          drive_link_in: test, // Use the drive_link_in variable directly
-         
+          drive_link_in: link,
+          ...(combine !== undefined && { combine })
         };
 
-        // Assuming process.id is defined and valid
         const job = new Job(process.id, args);
-        robot.startJob(job).then(
-          (result) => {
-            alert("The summary is sent to your email");
-          },
-          (err) => {
-            alert("Job Failed! " + err);
-          }
-        );
+        const jobPromise = new JobPromise(job);
+
+        jobPromise.onStatus((status) => {
+          addLog(`Status: ${status}`);
+        });
+
+        jobPromise.onWorkflowEvent((event) => {
+          addLog(`Workflow Event: ${event}`);
+        });
+
+        jobPromise
+          .then((result) => {
+            addLog("Job completed successfully");
+            setLoading(false);
+            setSuccessMessageVisible(true);
+          })
+          .catch((error) => {
+            addLog(`Job failed: ${error}`);
+            setLoading(false);
+          });
       },
       (err) => {
         alert("Error! " + err);
-      }
+        setLoading(false);
+      }      
     );
   };
 
@@ -123,28 +117,74 @@ const HeroPage = () => {
         className="w-[1140px] max-md:max-w-xl border border-green-300"
       />
 
-      <div className="flex gap-2">
-        <Button
-          className="bg-green-400 hover:bg-green-600 font-semibold"
-          type="button"
-          onClick={() => automate_summary("Drive_Summarize", folderLink, false)}
-        >
-          Extract individually
-        </Button>
-        <Button
-          className="bg-green-400 hover:bg-green-600 font-semibold"
-          type="button"
-          onClick={() => automate_summary("Drive_Summarize", folderLink, true)}
-        >
-          Extract Combined PDFs
-        </Button>
-        <Button
-          className="bg-green-400 hover:bg-green-600 font-semibold"
-          type="button"
-          onClick={() => automate_extract("Drive_Template", folderLink)}
-        >
-          Extract with Template
-        </Button>
+      {/* Render buttons only when not loading */}
+      {!loading && (
+        <div className="flex gap-2">
+          <Button
+            className="bg-green-400 hover:bg-green-600 font-semibold"
+            type="button"
+            onClick={() => automate_summary("Drive_Summarize", folderLink, false)}
+          >
+            Extract individually
+          </Button>
+          <Button
+            className="bg-green-400 hover:bg-green-600 font-semibold"
+            type="button"
+            onClick={() => automate_summary("Drive_Summarize", folderLink, true)}
+          >
+            Extract Combined PDFs
+          </Button>
+          <Button
+            className="bg-green-400 hover:bg-green-600 font-semibold"
+            type="button"
+            onClick={() => {
+              clearLogs();
+              automate_summary("Drive_Template", folderLink);
+            }}
+          >
+            Extract with Template
+          </Button>
+        </div>
+      )}
+
+      {/* Render loading spinner */}
+      {loading && (
+        <div className="mt-4 flex flex-col items-center justify-center">
+          <Spinner />
+          <p className="mt-2">Loading...</p>
+        </div>
+      )}
+
+      {/* Render Stop button */}
+      {loading && (
+        <div className="mt-4">
+          <Button
+            className="bg-red-500 hover:bg-red-700 font-semibold"
+            type="button"
+            onClick={stopJob}
+          >
+            Stop
+          </Button>
+        </div>
+      )}
+
+      {/* Render success message box */}
+      {successMessageVisible && (
+        <div className="mt-4 p-4 bg-green-100 border border-green-300 rounded">
+          <p className="text-green-800">The output file is sent to your email. Kindly check your mailbox.</p>
+          <button className="mt-2 text-red-600" onClick={() => setSuccessMessageVisible(false)}>Close</button>
+        </div>
+      )}
+
+      {/* Render log messages */}
+      <div className="mt-4 w-full max-w-xl p-4 rounded">
+        <ul>
+          {logs.map((log, index) => (
+            <li key={index} className="text-sm text-gray-700">
+              {log}
+            </li>
+          ))}
+        </ul>
       </div>
     </section>
   );
