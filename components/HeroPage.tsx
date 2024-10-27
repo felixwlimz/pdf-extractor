@@ -4,11 +4,10 @@ import { Button } from "./ui/button";
 import { Input } from "./ui/input";
 import { UiPathRobot } from "@uipath/robot";
 import { Job, RobotProcess, JobPromise} from "@uipath/robot/dist/models";
+import Spinner from "./Spinner";
 
 
-const Spinner = () => (
-  <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-green-600"></div>
-);
+
 
 const HeroPage = () => {
   const robot = UiPathRobot.init();

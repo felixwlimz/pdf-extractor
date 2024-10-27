@@ -5,13 +5,16 @@ import { cn } from "@/lib/utils";
 import { useToast } from "@/hooks/use-toast";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
+import { useLocalStorage } from "@/hooks/use-local-storage";
+import { encodePdfFiles } from "@/utils";
 
 const ExtractFiles = () => {
   const [pdfFiles, setPdfFiles] = useState<File[]>([]);
   const fileInput = useRef<HTMLInputElement>(null);
   const { toast } = useToast();
+  const [encodedFiles, setEncodedFiles] = useLocalStorage<string[]>('files', [])
 
-  const handleFileChange = (e: ChangeEvent<HTMLInputElement>) => {
+  const handleFileChange = async (e: ChangeEvent<HTMLInputElement>) => {
     const selectedPdfFiles = e.target.files;
     if (selectedPdfFiles && selectedPdfFiles.length > 0) {
       if (selectedPdfFiles[0].size > 10 * 1000 * 1024) {
@@ -21,13 +24,24 @@ const ExtractFiles = () => {
         });
         return;
       }
-
+      console.log(pdfFiles)
       const newFiles = Array.from(selectedPdfFiles);
       setPdfFiles((prevFiles) => [...prevFiles, ...newFiles]);
+      
+      try {
+        const encodedFiles = await encodePdfFiles(newFiles)
+        setEncodedFiles((files : string[]) => [files, ...encodedFiles])
+      } catch (error) {
+         toast({
+           title: "Failed to encode files",
+           description: (error as Error).message,
+           variant: "destructive",
+         });
+      }
     }
   };
 
-  const handleDrop = (e: DragEvent) => {
+  const handleDrop = async (e: DragEvent) => {
     e.preventDefault();
     const droppedFiles = e.dataTransfer.files;
     if (droppedFiles && droppedFiles.length > 0) {
@@ -40,6 +54,17 @@ const ExtractFiles = () => {
       }
       const newDroppedFiles = Array.from(droppedFiles);
       setPdfFiles((prevFiles) => [...prevFiles, ...newDroppedFiles]);
+
+      try {
+        const encodedFiles = await encodePdfFiles(newDroppedFiles);
+        setEncodedFiles((files: string[]) => [files, ...encodedFiles]);
+      } catch (error) {
+        toast({
+          title: "Failed to encode files",
+          description: (error as Error).message,
+          variant: "destructive",
+        });
+      }
     }
   };
 
