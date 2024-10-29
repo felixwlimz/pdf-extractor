@@ -1,18 +1,36 @@
 "use client";
 import { FileText, FileUp, FileX } from "lucide-react";
-import { ChangeEvent, DragEvent, useRef, useState } from "react";
+import { ChangeEvent, DragEvent, useEffect, useRef, useState } from "react";
 import { cn } from "@/lib/utils";
 import { useToast } from "@/hooks/use-toast";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { useLocalStorage } from "@/hooks/use-local-storage";
-import { encodePdfFiles } from "@/utils";
+import { decodeBase64ToFile, encodeFileToBase64 } from "@/utils";
+
 
 const ExtractFiles = () => {
   const [pdfFiles, setPdfFiles] = useState<File[]>([]);
   const fileInput = useRef<HTMLInputElement>(null);
   const { toast } = useToast();
-  const [encodedFiles, setEncodedFiles] = useLocalStorage<string[]>('files', [])
+
+  useEffect(() => {
+    const storedFiles = JSON.parse(localStorage.getItem("pdfFiles") || "[]");
+    const loadedFiles = storedFiles.map(
+      (item: { base64: string; name: string }) =>
+        decodeBase64ToFile(item.base64, item.name)
+    );
+    setPdfFiles(loadedFiles);
+  }, []);
+
+  useEffect(() => {
+    const filesToStore = pdfFiles.map(async (file) => ({
+      base64: await encodeFileToBase64(file),
+      name: file.name,
+    }));
+    Promise.all(filesToStore).then((storedFiles) =>
+      localStorage.setItem("pdfFiles", JSON.stringify(storedFiles))
+    );
+  }, [pdfFiles]);
 
   const handleFileChange = async (e: ChangeEvent<HTMLInputElement>) => {
     const selectedPdfFiles = e.target.files;
@@ -24,20 +42,8 @@ const ExtractFiles = () => {
         });
         return;
       }
-      console.log(pdfFiles)
       const newFiles = Array.from(selectedPdfFiles);
       setPdfFiles((prevFiles) => [...prevFiles, ...newFiles]);
-      
-      try {
-        const encodedFiles = await encodePdfFiles(newFiles)
-        setEncodedFiles((files : string[]) => [files, ...encodedFiles])
-      } catch (error) {
-         toast({
-           title: "Failed to encode files",
-           description: (error as Error).message,
-           variant: "destructive",
-         });
-      }
     }
   };
 
@@ -54,17 +60,6 @@ const ExtractFiles = () => {
       }
       const newDroppedFiles = Array.from(droppedFiles);
       setPdfFiles((prevFiles) => [...prevFiles, ...newDroppedFiles]);
-
-      try {
-        const encodedFiles = await encodePdfFiles(newDroppedFiles);
-        setEncodedFiles((files: string[]) => [files, ...encodedFiles]);
-      } catch (error) {
-        toast({
-          title: "Failed to encode files",
-          description: (error as Error).message,
-          variant: "destructive",
-        });
-      }
     }
   };
 
@@ -76,7 +71,9 @@ const ExtractFiles = () => {
 
   return (
     <section className="flex flex-col items-center justify-center gap-4">
-      <h2 className="text-[36px] font-bold text-green-600">Extract from File</h2>
+      <h2 className="text-[36px] font-bold text-green-600">
+        Extract from File
+      </h2>
       <p className="font-md text-lg">
         Drag and drop of a whole set for easy extraction
       </p>

@@ -55,8 +55,8 @@ const MobileNavbar = ({ user }: { user: User }) => {
                 </Link>
               </li>
               <li>
-                <Link href="/extract-drive" className="hover:text-green-600-700">
-                  Extract from Drive
+                <Link href="/extract-file" className="hover:text-green-600-700">
+                  Extract from File
                 </Link>
               </li>
             </ul>
