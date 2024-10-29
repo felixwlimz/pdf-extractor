@@ -18,3 +18,25 @@ export const decodeBase64ToFile = (base64: string, fileName: string): File => {
   }
   return new File([u8arr], fileName, { type: mime });
 };
+
+export const loadStoredFiles = () => {
+   try {
+     const storedData = localStorage.getItem("pdfFiles");
+     const storedFiles = storedData ? JSON.parse(storedData) : [];
+
+     if (Array.isArray(storedFiles)) {
+       const loadedFiles = storedFiles.map((item) =>
+         decodeBase64ToFile(item.base64, item.name)
+       );
+       return loadedFiles;
+     } else {
+       console.warn("Stored data is not an array. Clearing invalid data.");
+       localStorage.removeItem("pdfFiles");
+       return [];
+     }
+   } catch (error) {
+     console.error("Error loading files from localStorage:", error);
+     return [];
+   }
+ };
+

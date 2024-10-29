@@ -5,8 +5,12 @@ import { cn } from "@/lib/utils";
 import { useToast } from "@/hooks/use-toast";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { decodeBase64ToFile, encodeFileToBase64 } from "@/utils";
+import { decodeBase64ToFile, encodeFileToBase64, loadStoredFiles } from "@/utils";
 
+type PdfFile = {
+  base64: string;
+  name: string;
+};
 
 const ExtractFiles = () => {
   const [pdfFiles, setPdfFiles] = useState<File[]>([]);
@@ -14,11 +18,7 @@ const ExtractFiles = () => {
   const { toast } = useToast();
 
   useEffect(() => {
-    const storedFiles = JSON.parse(localStorage.getItem("pdfFiles") || "[]");
-    const loadedFiles = storedFiles.map(
-      (item: { base64: string; name: string }) =>
-        decodeBase64ToFile(item.base64, item.name)
-    );
+    const loadedFiles = loadStoredFiles()
     setPdfFiles(loadedFiles);
   }, []);
 
