@@ -3,6 +3,7 @@ import ChatNav from "@/components/ChatNav";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import model from "@/lib/gemini/config";
+import { cn } from "@/lib/utils";
 import { Content } from "@google/generative-ai";
 import { Plus, Send } from "lucide-react";
 import { useState } from "react";
@@ -47,16 +48,28 @@ const ChatBotPage = () => {
   return (
     <section className="flex flex-col justify-between p-4">
       <ChatNav />
-      <div className="flex-grow overflow-y-auto p-4 bg-gray-100 h-full">
+      <div
+        className="flex flex-col p-4 gap-3 bg-gray-100 flex-1 overflow-y-auto"
+        style={{ maxHeight: "calc(100vh - 200px)" }}
+      >
         {history.map((content, index) => (
-          <p key={index}>
-            {content.role === "user"
-              ? content.parts[0].text
-              : content.parts[0].text}
-          </p>
+          <div key={index} className={cn('flex', content.role === 'user' && 'justify-end')}>
+            <p
+              className={cn(
+                "p-2 rounded-lg w-fit",
+                content.role === "user"
+                  ? "bg-green-500 text-white"
+                  : "bg-gray-300"
+              )}
+            >
+              {content.role === "user"
+                ? content.parts[0].text
+                : content.parts[0].text}
+            </p>
+          </div>
         ))}
       </div>
-      <div className="w-full p-2 flex gap-5 items-center">
+      <div className="fixed bottom-0 top-[600px] w-[75%] p-2 flex gap-5 items-center">
         <Button
           type="button"
           className="rounded-[50px] bg-green-400 hover:bg-green-600 p-2"

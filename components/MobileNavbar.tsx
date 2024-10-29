@@ -51,7 +51,7 @@ const MobileNavbar = ({ user }: { user: User }) => {
             <ul className="flex flex-col gap-5 font-semibold text-lg">
               <li>
                 <Link href="/chat-bot" className="hover:text-green-600-700 ">
-                  laufey.ai
+                  chat.ai
                 </Link>
               </li>
               <li>

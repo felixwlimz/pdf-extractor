@@ -21,7 +21,7 @@ const Navbar = ({ user } : { user : User}) => {
           <ul className="flex gap-5 font-semibold text-lg max-[768px]:hidden">
             <li>
               <Link href="/chat-bot" className="hover:text-green-600">
-                laufey.ai
+                chat.ai
               </Link>
             </li>
             <li>
