@@ -1,106 +1,97 @@
- "use client";
+"use client";
 import { ChangeEvent, useState } from "react";
 import { Button } from "./ui/button";
 import { Input } from "./ui/input";
-import { UiPathRobot } from "@uipath/robot";
-import { Job, RobotProcess, JobPromise} from "@uipath/robot/dist/models";
 import Spinner from "./Spinner";
-
-
-
+import useRobot from "@/hooks/use-robot";
+import { useToast } from "@/hooks/use-toast";
 
 const HeroPage = () => {
-  const robot = UiPathRobot.init();
-  const [folderLink, setFolderLink] = useState<string>("");
-  const [logs, setLogs] = useState<string[]>([]);
-  const [loading, setLoading] = useState<boolean>(false);
-  const [successMessageVisible, setSuccessMessageVisible] = useState<boolean>(false);
-  const [robotProcess, setRobotProcess] = useState<RobotProcess | null>(null); // State for storing robot process
+  const [selectedOption, setSelectedOption] = useState('');
+  const { toast } = useToast();
 
-  const handleLinkChange = (e: ChangeEvent<HTMLInputElement>) => {
-    setFolderLink(e.target.value);
+
+  const handleSelectChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
+      setSelectedOption(event.target.value);
+      // Reset min and max words when the option changes
+  };
+  const {
+    folderLink,
+    setFolderLink,
+    logs,
+    loading,
+    successMessageVisible,
+    maxWords,
+    handleLinkChange,
+    addLog,
+    clearLogs,
+    stopJob,
+    automate_summary,
+    setSuccessMessageVisible,
+    setMaxWords
+  } = useRobot();
+
+  const handleMaxWordsChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const value = event.target.value;
+    setMaxWords(parseInt(value));
   };
 
-  const addLog = (message: string) => {
-    setLogs((prevLogs) => [...prevLogs, message]);
-  };
-
-  const clearLogs = () => {
-    setLogs([]);
-  };
-
-  const stopJob = () => {
-    if (robotProcess) {
-      robot.stopProcess(robotProcess); // Stop the robot process
-      addLog("Job has been stopped.");
+  const handleButtonClick = () => {
+    console.log(maxWords)
+    if (selectedOption === 'template') {
+      console.log('Extracting with template');
+      clearLogs();
+      automate_summary("Drive_Template", folderLink);
+    } else if (selectedOption === 'individual') {
+      console.log('Summarizing individually');
+      clearLogs();
+      automate_summary("Drive_Summarize", folderLink, false, maxWords)
+    } else if (selectedOption === 'combine') {
+      console.log('Summarizing together');
+      clearLogs();
+      automate_summary("Drive_Summarize", folderLink, true, maxWords)
     }
-    setLoading(false);
+    else{
+      toast({ title: "Please select an option first", variant: "destructive" });
+      return;
+    }
   };
 
-  const automate_summary = (processName: string, link: string, combine?: boolean): void => {
-    clearLogs();
-    setLoading(true);
-    setSuccessMessageVisible(false);
-    robot.getProcesses().then(
-      (processes: Array<{ id: string; name: string }>) => {
-        if (processes.length === 0) {
-          alert("Robot not connected to Orchestrator or no processes are available");
-          setLoading(false);
-          return;
-        }
-
-        const process = processes.find((p) => p.name.includes(processName));
-        
-        if (!process) {
-          alert(`No process found with name containing: ${processName}`);
-          setLoading(false);
-          return;
-        }
-
-        const newRobotProcess = new RobotProcess(process.id, processName); // Create the RobotProcess
-        setRobotProcess(newRobotProcess); // Store the robotProcess in state
-
-        interface Arguments {
-          drive_link_in: string;
-          combine?: boolean;
-        }
-
-        const args: Arguments = {
-          drive_link_in: link,
-          ...(combine !== undefined && { combine })
-        };
-
-        const job = new Job(process.id, args);
-        const jobPromise = new JobPromise(job);
-
-        jobPromise.onStatus((status) => {
-          addLog(`Status: ${status}`);
-        });
-
-        jobPromise.onWorkflowEvent((event) => {
-          addLog(`Workflow Event: ${event}`);
-        });
-
-        jobPromise
-          .then((result) => {
-            addLog("Job completed successfully");
-            setLoading(false);
-            setSuccessMessageVisible(true);
-          })
-          .catch((error) => {
-            addLog(`Job failed: ${error}`);
-            setLoading(false);
-          });
-      },
-      (err) => {
-        alert("Error! " + err);
-        setLoading(false);
-      }      
-    );
-  };
-
+  
   return (
-    <section className="flex flex-col items-center justify-center gap-8">
+    <section className="ml-64 flex flex-col items-center justify-center gap-8">
+      <div className="flex w-full justify-start items-center">
+        <div className="flex-none">
+          <select
+            className="border border-green-400 rounded-lg p-2"
+            value={selectedOption}
+            onChange={handleSelectChange}
+          >
+            <option value="">Select Option</option>
+            <option value="template">Extract with Template</option>
+            <option value="individual">Summarize Individually</option>
+            <option value="combine">Summarize Together</option>
+          </select>
+          
+        </div>
+
+        {(selectedOption === 'individual' || selectedOption === 'combine') && (
+          <div className="flex items-center ml-4"> {/* Added margin-left for spacing */}
+
+            <label className="ml-4 mr-2">Max Words:</label>
+            <input
+              type="number"
+              value={maxWords}
+              onChange={handleMaxWordsChange}
+              className="border border-green-400 rounded-lg p-2 w-24"
+              placeholder="Max"
+              min="0"
+              max="1000"
+            />
+          </div>
+          
+        )}
+      </div>
       <h2 className="text-[36px] font-bold text-green-600">
         Extract your PDF files
       </h2>
@@ -122,27 +113,11 @@ const HeroPage = () => {
           <Button
             className="bg-green-400 hover:bg-green-600 font-semibold"
             type="button"
-            onClick={() => automate_summary("Drive_Summarize", folderLink, false)}
+            onClick={handleButtonClick}
           >
-            Extract individually
+            Extract PDFs
           </Button>
-          <Button
-            className="bg-green-400 hover:bg-green-600 font-semibold"
-            type="button"
-            onClick={() => automate_summary("Drive_Summarize", folderLink, true)}
-          >
-            Extract Combined PDFs
-          </Button>
-          <Button
-            className="bg-green-400 hover:bg-green-600 font-semibold"
-            type="button"
-            onClick={() => {
-              clearLogs();
-              automate_summary("Drive_Template", folderLink);
-            }}
-          >
-            Extract with Template
-          </Button>
+
         </div>
       )}
 

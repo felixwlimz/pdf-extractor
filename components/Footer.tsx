@@ -2,7 +2,7 @@ import React from 'react';
 
 const Footer = () => {
   return (
-    <footer className="bg-gray-100 w-full p-4 mt-4">
+    <footer className="bg-gray-200 text-black p-4 absolute bottom-0 left-0 right-0 z-20">
       <div className="text-semibold font-medium">
         © 2024 PDF Extractor. All rights reserved
       </div>
