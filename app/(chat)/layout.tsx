@@ -1,10 +1,9 @@
-import ChatSidebar from "@/components/ChatSidebar";
 
 const ChatLayout = ({ children } : { children : React.ReactNode }) => {
+
   return (
     <div className="w-full">
-      <ChatSidebar />
-      <main className="md:ml-[350px]">{children}</main>
+      <main>{children}</main>
     </div>
   );
 }

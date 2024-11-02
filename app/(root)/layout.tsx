@@ -27,6 +27,7 @@ export default async function RootLayout({
 
     </div>
   );
+
 }
 
 // return (
