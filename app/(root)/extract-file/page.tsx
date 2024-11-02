@@ -46,7 +46,39 @@ const ExtractFiles = () => {
       setPdfFiles((prevFiles) => [...prevFiles, ...newFiles]);
     }
   };
-
+  const handleFileUpload = async () => {
+    const uploadsDir = `uploads/${new Date(new Date().toLocaleString("en-US", { timeZone: "Asia/Bangkok" }))
+    .toLocaleString("en-GB", { hour12: false })
+    .replace(",", "")
+    .replace(/\//g, "-")
+    .replace(/:/g, "-")}`; // Define the upload directory
+    
+    for (const file of pdfFiles) {
+      const formData = new FormData();
+      formData.append("file", file);
+  
+      try {
+        const response = await fetch(`/api/upload?uploadsDir=${encodeURIComponent(uploadsDir)}`, {
+          method: "POST",
+          body: formData,
+        });
+  
+        if (!response.ok) {
+          toast({ title: "Upload failed", variant: "destructive" });
+          continue;
+        }
+  
+        const data = await response.json();
+        toast({ title: `${file.name} uploaded successfully` });
+        console.log(uploadsDir); // Display the server's confirmation of the directory
+      } catch (error) {
+        toast({
+          title: `Error uploading ${file.name}`,
+          variant: "destructive",
+        });
+      }
+    }
+  };
   const handleDrop = async (e: DragEvent) => {
     e.preventDefault();
     const droppedFiles = e.dataTransfer.files;
@@ -120,6 +152,7 @@ const ExtractFiles = () => {
         <Button
           className="bg-green-500 hover:bg-green-600 font-semibold"
           type="button"
+          onClick={handleFileUpload}
         >
           Extract PDF
         </Button>
