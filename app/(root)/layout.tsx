@@ -7,12 +7,11 @@ export default async function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-    const user = await currentUser();
+  const user = await currentUser();
 
   return (
-
     <div className="flex flex-col min-h-screen">
-      <Navbar user={user!}/>
+      <Navbar user={user!} />
       <main className="flex-grow">{children}</main>
       <Footer />
     </div>
