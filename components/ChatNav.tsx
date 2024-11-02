@@ -1,6 +1,4 @@
 import { UserButton } from '@clerk/nextjs';
-import { Content } from '@google/generative-ai';
-import React from 'react'
 
 const ChatNav = () => {
   return (

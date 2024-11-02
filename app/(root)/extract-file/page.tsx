@@ -5,7 +5,12 @@ import { cn } from "@/lib/utils";
 import { useToast } from "@/hooks/use-toast";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { decodeBase64ToFile, encodeFileToBase64, loadStoredFiles } from "@/utils";
+import {
+  decodeBase64ToFile,
+  encodeFileToBase64,
+  loadStoredFiles,
+} from "@/utils";
+import SideChat from "@/components/SideChat";
 
 type PdfFile = {
   base64: string;
@@ -16,9 +21,10 @@ const ExtractFiles = () => {
   const [pdfFiles, setPdfFiles] = useState<File[]>([]);
   const fileInput = useRef<HTMLInputElement>(null);
   const { toast } = useToast();
+  const [isOpen, setIsOpen] = useState(false);
 
   useEffect(() => {
-    const loadedFiles = loadStoredFiles()
+    const loadedFiles = loadStoredFiles();
     setPdfFiles(loadedFiles);
   }, []);
 
@@ -47,27 +53,32 @@ const ExtractFiles = () => {
     }
   };
   const handleFileUpload = async () => {
-    const uploadsDir = `uploads/${new Date(new Date().toLocaleString("en-US", { timeZone: "Asia/Bangkok" }))
-    .toLocaleString("en-GB", { hour12: false })
-    .replace(",", "")
-    .replace(/\//g, "-")
-    .replace(/:/g, "-")}`; // Define the upload directory
-    
+    const uploadsDir = `uploads/${new Date(
+      new Date().toLocaleString("en-US", { timeZone: "Asia/Bangkok" })
+    )
+      .toLocaleString("en-GB", { hour12: false })
+      .replace(",", "")
+      .replace(/\//g, "-")
+      .replace(/:/g, "-")}`; // Define the upload directory
+
     for (const file of pdfFiles) {
       const formData = new FormData();
       formData.append("file", file);
-  
+
       try {
-        const response = await fetch(`/api/upload?uploadsDir=${encodeURIComponent(uploadsDir)}`, {
-          method: "POST",
-          body: formData,
-        });
-  
+        const response = await fetch(
+          `/api/upload?uploadsDir=${encodeURIComponent(uploadsDir)}`,
+          {
+            method: "POST",
+            body: formData,
+          }
+        );
+
         if (!response.ok) {
           toast({ title: "Upload failed", variant: "destructive" });
           continue;
         }
-  
+
         const data = await response.json();
         toast({ title: `${file.name} uploaded successfully` });
         console.log(uploadsDir); // Display the server's confirmation of the directory
@@ -102,72 +113,75 @@ const ExtractFiles = () => {
   };
 
   return (
-    <section className="flex flex-col items-center justify-center gap-4">
-      <h2 className="text-[36px] font-bold text-green-600">
-        Extract from File
-      </h2>
-      <p className="font-md text-lg">
-        Drag and drop of a whole set for easy extraction
-      </p>
-      <div
-        className={cn(
-          "relative flex rounded-lg border border-dashed left-0 border-green-400 w-[640px] lg:min-w-[1140px] h-[275px] lg:min-h-[380px] p-3",
-          pdfFiles.length === 0 ? "items-center justify-center" : ""
-        )}
-      >
-        {pdfFiles.length === 0 && (
-          <div className="absolute flex flex-col gap-3 items-center h-full justify-center">
-            <FileUp size={60} className="text-green-600 font-semibold" />
-            <p className="font-bold text-gray-400">
-              Drag and drop PDF files to upload. Max 10MB
-            </p>
-          </div>
-        )}
-        <div className="flex flex-col flex-wrap w-full gap-3 items-start">
-          {pdfFiles.length > 0 &&
-            pdfFiles.map((pdfFile) => (
-              <div className="flex gap-2" key={pdfFile.name}>
-                <FileText />
-                <span className="text-sm font-semibold">{pdfFile.name}</span>
-                <FileX
-                  onClick={() => onDelete(pdfFile.name)}
-                  className="cursor-pointer"
-                />
-              </div>
-            ))}
-        </div>
-        <Input
-          type="file"
-          multiple
-          ref={fileInput}
-          accept=".pdf,.docx"
-          onChange={handleFileChange}
-          onDrop={handleDrop}
-          onDragOver={(e) => e.preventDefault()}
-          className="opacity-0 cursor-pointer"
-        />
-      </div>
-
-      <div className="flex gap-2">
-        <Button
-          className="bg-green-500 hover:bg-green-600 font-semibold"
-          type="button"
-          onClick={handleFileUpload}
+    <div className={cn("w-full h-full ml-4 mb-10", isOpen && "flex gap-4")}>
+      <section className="flex flex-col items-center justify-center gap-4">
+        <h2 className="text-[36px] font-bold text-green-600">
+          Extract from File
+        </h2>
+        <p className="font-md text-lg">
+          Drag and drop of a whole set for easy extraction
+        </p>
+        <div
+          className={cn(
+            "relative flex rounded-lg border border-dashed left-0 border-green-400 w-[640px] lg:min-w-[1140px] h-[275px] lg:min-h-[380px] p-3",
+            pdfFiles.length === 0 ? "items-center justify-center" : ""
+          )}
         >
-          Extract PDF
-        </Button>
-        {pdfFiles.length > 0 && (
+          {pdfFiles.length === 0 && (
+            <div className="absolute flex flex-col gap-3 items-center h-full justify-center">
+              <FileUp size={60} className="text-green-600 font-semibold" />
+              <p className="font-bold text-gray-400">
+                Drag and drop PDF files to upload. Max 10MB
+              </p>
+            </div>
+          )}
+          <div className="flex flex-col flex-wrap w-full gap-3 items-start">
+            {pdfFiles.length > 0 &&
+              pdfFiles.map((pdfFile) => (
+                <div className="flex gap-2" key={pdfFile.name}>
+                  <FileText />
+                  <span className="text-sm font-semibold">{pdfFile.name}</span>
+                  <FileX
+                    onClick={() => onDelete(pdfFile.name)}
+                    className="cursor-pointer"
+                  />
+                </div>
+              ))}
+          </div>
+          <Input
+            type="file"
+            multiple
+            ref={fileInput}
+            accept=".pdf,.docx"
+            onChange={handleFileChange}
+            onDrop={handleDrop}
+            onDragOver={(e) => e.preventDefault()}
+            className="opacity-0 cursor-pointer"
+          />
+        </div>
+
+        <div className="flex gap-2">
           <Button
-            variant="outline"
-            className="border border-green-500 hover:bg-green-600 hover:text-white font-semibold"
+            className="bg-green-500 hover:bg-green-600 font-semibold"
             type="button"
-            onClick={() => fileInput.current?.click()}
+            onClick={handleFileUpload}
           >
-            Add More Files
+            Extract PDF
           </Button>
-        )}
-      </div>
-    </section>
+          {pdfFiles.length > 0 && (
+            <Button
+              variant="outline"
+              className="border border-green-500 hover:bg-green-600 hover:text-white font-semibold"
+              type="button"
+              onClick={() => fileInput.current?.click()}
+            >
+              Add More Files
+            </Button>
+          )}
+        </div>
+      </section>
+      <SideChat isOpen={isOpen} setIsOpen={setIsOpen} />
+    </div>
   );
 };
 
