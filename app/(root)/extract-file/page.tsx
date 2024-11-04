@@ -10,6 +10,7 @@ import useRobot from "@/hooks/use-robot";
 import path from 'path';
 import Spinner from "@/components/Spinner";
 import SideChat from "@/components/SideChat";
+import Link from 'next/link';
 
 type PdfFile = {
   base64: string;
@@ -17,6 +18,8 @@ type PdfFile = {
 };
 
 const ExtractFiles = () => {
+
+
   const [selectedOption, setSelectedOption] = useState('');
   const [pdfFiles, setPdfFiles] = useState<File[]>([]);
   const fileInput = useRef<HTMLInputElement>(null);
@@ -36,7 +39,13 @@ const ExtractFiles = () => {
     setSuccessMessageVisible,
     setMaxWords
   } = useRobot();
+  const [language, setLanguage] = useState('en'); // Default language
 
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      setLanguage(window.navigator.language.slice(0, 2));
+    }
+  }, []);
 
 
   const handleMaxWordsChange = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -80,12 +89,26 @@ const ExtractFiles = () => {
     }
   };
   const handleFileUpload = async () => {
+
     if (!selectedOption) {
       toast({ title: "Please select an option first", variant: "destructive" });
       return;
     }
+    const time = new Date().toLocaleString("en-GB", {
+      timeZone: "Asia/Bangkok",
+      day: "2-digit",
+      month: "2-digit",
+      year: "numeric",
+      hour: "2-digit",
+      minute: "2-digit",
+      second: "2-digit",
+      hour12: false,
+    }).replace(",", "").replace(" ", " ").split("/").map((part, index) => index === 0 ? part : part).join("/").replace(" ", " ");
+    
+    console.log(time); // Outputs in DD/MM/yyyy HH:mm:ss format
+
     const uploadsDir = 
-      `uploads/${new Date(new Date().toLocaleString("en-US", { timeZone: "Asia/Bangkok" }))
+      `public/uploads/${new Date(new Date().toLocaleString("en-US", { timeZone: "Asia/Bangkok" }))
         .toLocaleString("en-GB", { hour12: false })
         .replace(",", "")
         .replace(/\//g, "-")
@@ -117,21 +140,45 @@ const ExtractFiles = () => {
         return;
       }
     }
-    const upload_path = "C:/Users/longh/Documents/pdf-extractor/" + uploadsDir
+    const upload_path = process.env.NEXT_PUBLIC_UPLOAD_PATH + uploadsDir;
 
     if (selectedOption === 'template') {
       console.log('Extracting with template');
       clearLogs();
-      automate_summary("Upload_Template", upload_path)
+      
+      automate_summary("Upload_Template", upload_path, true, time, pdfFiles.length, undefined, undefined);
+    
     } else if (selectedOption === 'individual') {
       console.log('Summarizing individually');
       clearLogs();
-      automate_summary("Upload_Summarize", upload_path, false, maxWords)
+      automate_summary("Upload_Summarize", upload_path, true, time, pdfFiles.length, false, maxWords )
     } else if (selectedOption === 'combine') {
       console.log('Summarizing together');
       clearLogs();
-      automate_summary("Upload_Summarize", upload_path, true, maxWords)
+      automate_summary("Upload_Summarize", upload_path, true, time, pdfFiles.length, true, maxWords)
     }
+  };
+
+  const handleDrop = async (e: DragEvent) => {
+    e.preventDefault();
+    const droppedFiles = e.dataTransfer.files;
+    if (droppedFiles && droppedFiles.length > 0) {
+      if (droppedFiles[0].size > 10 * 1000 * 1024) {
+        toast({
+          title: "Maximum size exceeded",
+          variant: "destructive",
+        });
+        return;
+      }
+      const newDroppedFiles = Array.from(droppedFiles);
+      setPdfFiles((prevFiles) => [...prevFiles, ...newDroppedFiles]);
+    }
+  };
+
+  const onDelete = (fileName: string) => {
+    setPdfFiles((prevFiles) =>
+      prevFiles.filter((file) => file.name !== fileName)
+    );
   };
 
   return (

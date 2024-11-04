@@ -11,7 +11,6 @@ export const config = {
 export async function POST(req: Request) {
   const { searchParams } = new URL(req.url);
   const uploadsDir = path.join(process.cwd(), searchParams.get("uploadsDir") || "uploads");
-
   // Ensure the uploads directory exists
   if (!fs.existsSync(uploadsDir)) {
     fs.mkdirSync(uploadsDir, { recursive: true });

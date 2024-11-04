@@ -51,6 +51,15 @@ const Sidebar = () => {
               Upload New Files
             </Link>
           </li>
+          <Link
+              href="/history" 
+              className={`px-3 py-2 rounded ${
+                isActive("/history") ? "bg-gray-700" : "hover:bg-gray-700 hover:text-green-600"
+              }`}
+            >
+              History 
+            </Link>
+
         </ul>
       </nav>
     </div>

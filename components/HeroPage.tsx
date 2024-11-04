@@ -5,8 +5,8 @@ import { Input } from "./ui/input";
 import Spinner from "./Spinner";
 import useRobot from "@/hooks/use-robot";
 import { useToast } from "@/hooks/use-toast";
-
 const HeroPage = () => {
+
   const [selectedOption, setSelectedOption] = useState('');
   const { toast } = useToast();
 
@@ -37,19 +37,31 @@ const HeroPage = () => {
   };
 
   const handleButtonClick = () => {
-    console.log(maxWords)
+    const time = new Date().toLocaleString("en-GB", {
+      timeZone: "Asia/Bangkok",
+      day: "2-digit",
+      month: "2-digit",
+      year: "numeric",
+      hour: "2-digit",
+      minute: "2-digit",
+      second: "2-digit",
+      hour12: false,
+    }).replace(",", "").replace(" ", " ").split("/").map((part, index) => index === 0 ? part : part).join("/").replace(" ", " ");
+    
+    console.log(time); // Outputs in DD/MM/yyyy HH:mm:ss format
+
     if (selectedOption === 'template') {
       console.log('Extracting with template');
       clearLogs();
-      automate_summary("Drive_Template", folderLink);
+      automate_summary("Drive_Template", folderLink, false, time, undefined, undefined, undefined);
     } else if (selectedOption === 'individual') {
       console.log('Summarizing individually');
       clearLogs();
-      automate_summary("Drive_Summarize", folderLink, false, maxWords)
+      automate_summary("Drive_Summarize", folderLink, false, time, undefined, false, maxWords)
     } else if (selectedOption === 'combine') {
       console.log('Summarizing together');
       clearLogs();
-      automate_summary("Drive_Summarize", folderLink, true, maxWords)
+      automate_summary("Drive_Summarize", folderLink, false, time, undefined, true, maxWords)
     }
     else{
       toast({ title: "Please select an option first", variant: "destructive" });
