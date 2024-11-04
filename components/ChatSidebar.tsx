@@ -1,14 +1,15 @@
 import { Content } from "@google/generative-ai";
 import { Brain, Ellipsis, MessageCircleMore } from "lucide-react";
+import Link from "next/link";
 import React from "react";
 
 const ChatSidebar = ({chats } : { chats : Content[]}) => {
   return (
     <div className="fixed max-[768px]:hidden bg-green-400 space-y-4 text-white h-full w-[350px] flex flex-col gap-10 p-8">
-      <div className="flex gap-3">
+      <Link href='/' className="flex gap-3 cursor-pointer">
         <Brain size={32} />
         <h3 className="text-2xl font-bold">chat.ai</h3>
-      </div>
+      </Link>
 
       <div className="w-full">
         <div className="flex gap-3 text-xl cursor-pointer hover:bg-green-600 rounded-lg p-2">

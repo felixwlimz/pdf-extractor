@@ -59,7 +59,7 @@ const HeroPage = () => {
 
   
   return (
-    <section className="ml-64 flex flex-col items-center justify-center gap-8">
+    <section className="md:ml-64 flex flex-col items-center justify-center gap-8">
       <div className="flex w-full justify-start items-center">
         <div className="flex-none">
           <select

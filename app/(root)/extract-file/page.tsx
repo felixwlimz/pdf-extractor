@@ -133,10 +133,31 @@ const ExtractFiles = () => {
       automate_summary("Upload_Summarize", upload_path, true, maxWords)
     }
   };
+   const handleDrop = async (e: DragEvent) => {
+     e.preventDefault();
+     const droppedFiles = e.dataTransfer.files;
+     if (droppedFiles && droppedFiles.length > 0) {
+       if (droppedFiles[0].size > 10 * 1000 * 1024) {
+         toast({
+           title: "Maximum size exceeded",
+           variant: "destructive",
+         });
+         return;
+       }
+       const newDroppedFiles = Array.from(droppedFiles);
+       setPdfFiles((prevFiles) => [...prevFiles, ...newDroppedFiles]);
+     }
+   };
+
+   const onDelete = (fileName: string) => {
+     setPdfFiles((prevFiles) =>
+       prevFiles.filter((file) => file.name !== fileName)
+     );
+   };
 
   return (
     <div className={cn("w-full h-full ml-4 mb-10", isOpen && "flex gap-4")}>
-      <section className="ml-64 flex flex-col items-center justify-center gap-8">
+      <section className="md:ml-64 flex flex-col items-center justify-center gap-8">
         <div className="flex w-full justify-start items-center">
           <div className="flex-none">
             <select
@@ -169,16 +190,16 @@ const ExtractFiles = () => {
 
           )}
         </div>
-        <h2 className="text-[36px] font-bold text-green-600">
+        <h2 className="lg:text-[36px] text-[28px] font-bold text-green-600">
           Extract from File
         </h2>
-        <p className="font-md text-lg">
+        <p className="font-md lg:text-lg text-md">
           Drag and drop of a whole set for easy extraction
         </p>
 
         <div
         className={cn(
-          "relative flex rounded-lg border border-dashed left-0 border-green-400 w-[640px] lg:min-w-[1140px] h-[275px] lg:min-h-[200px] p-3",
+          "relative flex rounded-lg border border-dashed left-0 border-green-400 w-[400px] md:w-[640px] lg:min-w-[1140px] h-[275px] lg:min-h-[200px] p-3",
           pdfFiles.length === 0 ? "items-center justify-center" : ""
         )}
         style={{ overflowY: "auto", maxHeight: "275px" }} 
@@ -275,7 +296,7 @@ const ExtractFiles = () => {
           </ul>
         </div>
       </section>
-      <SideChat isOpen={isOpen} setIsOpen={setIsOpen} />
+      <SideChat/>
     </div>
   );
 }

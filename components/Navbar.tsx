@@ -10,6 +10,10 @@ const Navbar = ({ user } : { user : User }) => {
   return (
     <nav className="w-full p-4 flex justify-between items-center">
       <MobileNavbar user={user} />
+      <Link href="/" className="font-semibold text-xl text-green-500 lg:hidden text-center">
+        PDFExtractor
+      </Link>
+      <div/>
       <div className="flex gap-4 items-center ml-auto max-[768px]:hidden">
         {!user ? (
           <>

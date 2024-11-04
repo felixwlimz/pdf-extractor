@@ -12,9 +12,11 @@ type SideChatProps = {
   setIsOpen: Dispatch<SetStateAction<boolean>>;
 };
 
-const SideChat = ({ isOpen, setIsOpen }: SideChatProps) => {
+const SideChat = () => {
   const [message, setMessage] = useState("");
   const [history, setHistory] = useState<Content[]>([]);
+    const [isOpen, setIsOpen] = useState(false);
+
 
   const sendMessage = async () => {
     if (!message.trim()) return;
@@ -53,8 +55,8 @@ const SideChat = ({ isOpen, setIsOpen }: SideChatProps) => {
     <>
       <Button
         className={cn(
-          "absolute bg-green-500 hover:bg-green-600 rounded-[50%] bottom-10 h-[60px] w-[60px]",
-          isOpen ? "right-[320px] m-5" : "right-10"
+          "absolute bg-green-500 hover:bg-green-600 rounded-[50%] bottom-0 h-[60px] w-[60px]",
+          isOpen ? "bottom-0 right-0 mt-10 mr-10" : "right-10"
         )}
       >
         {!isOpen ? (
@@ -64,7 +66,7 @@ const SideChat = ({ isOpen, setIsOpen }: SideChatProps) => {
         )}
       </Button>
       {isOpen && (
-        <section className="flex flex-col justify-between p-4">
+        <section className="absolute bottom-20 right-0 h-[70%] flex flex-col justify-between p-4 bg-gray-100 border border-gray-300 rounded-lg mr-5">
           <div>
             <h3 className="text-xl font-bold">Chat</h3>
           </div>
@@ -79,10 +81,10 @@ const SideChat = ({ isOpen, setIsOpen }: SideChatProps) => {
               >
                 <p
                   className={cn(
-                    "p-2 rounded-lg w-fit h-fit",
+                    "p-2 m-4 rounded-lg h-fit",
                     content.role === "user"
                       ? "bg-green-500 text-white"
-                      : "bg-gray-300"
+                      : "bg-gray-300 w-[120px]"
                   )}
                 >
                   {content.role === "user"

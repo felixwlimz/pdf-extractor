@@ -1,6 +1,5 @@
 import Navbar from "@/components/Navbar";
 import Sidebar from "@/components/Sidebar";
-import Footer from "@/components/Footer";
 import { currentUser } from "@clerk/nextjs/server";
 
 export default async function RootLayout({

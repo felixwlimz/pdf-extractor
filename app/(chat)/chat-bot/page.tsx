@@ -85,7 +85,7 @@ const ChatBotPage = () => {
             </div>
           ))}
         </div>
-        <div className="fixed bottom-0 top-[600px] w-[75%] p-2 flex gap-5 items-center">
+        <div className="fixed bottom-0 top-[600px] max-md:w-[95%] w-[75%] p-2 flex gap-5 items-center">
           <Button
             type="button"
             className="rounded-[50px] bg-green-400 hover:bg-green-600 p-2"
