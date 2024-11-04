@@ -33,7 +33,7 @@
     "**/*.ts",
     "**/*.tsx",
     ".next/types/**/*.ts"
-  ],
+, "lib/mongodb.ts", "lib/database.js"  ],
   "exclude": [
     "node_modules"
   ]
