@@ -69,9 +69,9 @@ const ExtractFiles = () => {
       base64: await encodeFileToBase64(file),
       name: file.name,
     }));
-    Promise.all(filesToStore).then((storedFiles) =>
-      localStorage.setItem("pdfFiles", JSON.stringify(storedFiles))
-    );
+    // Promise.all(filesToStore).then((storedFiles) =>
+    //   //localStorage.setItem("pdfFiles", JSON.stringify(storedFiles))
+    // );
   }, [pdfFiles]);
 
   const handleFileChange = async (e: ChangeEvent<HTMLInputElement>) => {
