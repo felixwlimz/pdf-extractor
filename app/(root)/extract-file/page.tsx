@@ -180,28 +180,6 @@ const ExtractFiles = () => {
      );
    };
 
-  const handleDrop = async (e: DragEvent) => {
-    e.preventDefault();
-    const droppedFiles = e.dataTransfer.files;
-    if (droppedFiles && droppedFiles.length > 0) {
-      if (droppedFiles[0].size > 10 * 1000 * 1024) {
-        toast({
-          title: "Maximum size exceeded",
-          variant: "destructive",
-        });
-        return;
-      }
-      const newDroppedFiles = Array.from(droppedFiles);
-      setPdfFiles((prevFiles) => [...prevFiles, ...newDroppedFiles]);
-    }
-  };
-
-  const onDelete = (fileName: string) => {
-    setPdfFiles((prevFiles) =>
-      prevFiles.filter((file) => file.name !== fileName)
-    );
-  };
-
   return (
     <div className={cn("w-full h-full ml-4 mb-10", isOpen && "flex gap-4")}>
       <section className="md:ml-64 flex flex-col items-center justify-center gap-8">
