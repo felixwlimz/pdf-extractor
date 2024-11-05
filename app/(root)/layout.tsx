@@ -8,7 +8,6 @@ export default async function RootLayout({
   children: React.ReactNode;
 }>) {
   const user = await currentUser();
-
   return (
     <div className="flex flex-col min-h-screen">
       {/* Top Navbar for Login/Signup */}
@@ -17,7 +16,7 @@ export default async function RootLayout({
       {/* Main Layout with Sidebar */}
       <div className="flex flex-grow">
         <Sidebar /> {/* Sidebar will take up its own space on the left */}
-
+        
         {/* Main Content Area */}
         <main className="flex-grow p-4 bg-gray-100">
           {children}

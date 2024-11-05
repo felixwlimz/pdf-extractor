@@ -41,7 +41,7 @@ const HistoryPage = () => {
         <p className="text-red-500">{errorMsg}</p>
       ) : fileHistory.length > 0 ? (
         <div className="overflow-x-auto w-full md:overflow-hidden"> {/* Prevent x-axis scrolling on larger screens */}
-          <table className="min-w-full bg-white rounded-lg shadow-md max-w-full"> {/* Set max-w-full on table */}
+          <table className="min-w-full bg-white rounded-lg shadow-md max-w-full">
             <thead>
               <tr className="bg-gray-200">
                 <th className="py-3 px-4 text-center text-sm font-medium text-gray-700">Extraction Time</th>
@@ -56,10 +56,18 @@ const HistoryPage = () => {
               {fileHistory.map((file: any, index: number) => (
                 <tr key={index} className="border-b hover:bg-gray-50">
                   <td className="py-3 px-4 text-center text-sm">{file.time}</td>
-                  <td className="py-3 px-4 text-center text-sm">{file.drive_upload ? "Files Upload" : "Google Drive"}</td>
-                  <td className="py-3 px-4 text-sm text-center">{file.way_extract || "N/A"}</td>
-                  <td className="py-3 px-4 text-sm text-center">{file.no_files || 0}</td>
-                  <td className="py-3 px-4 text-sm text-center">{file.success ? "Success" : "Failed" }</td>
+                  <td className="py-3 px-4 text-center text-sm">
+                    {file.drive_upload ? "Files Upload" : "Google Drive"}
+                  </td>
+                  <td className="py-3 px-4 text-sm text-center">
+                    {file.way_extract || "N/A"}
+                  </td>
+                  <td className="py-3 px-4 text-sm text-center">
+                    {file.no_files || 0}
+                  </td>
+                  <td className="py-3 px-4 text-sm text-center">
+                    {file.success ? "Success" : "Failed"}
+                  </td>
                   <td className="py-3 px-4 text-sm text-center">
                     {file.success ? (
                       <a
@@ -72,10 +80,8 @@ const HistoryPage = () => {
                       >
                         {file.filepath.endsWith(".zip") ? "Download ZIP" : "View in Drive"}
                       </a>
-                      ) : (
-                      <div className="py-2 px-4 rounded bg-red-500 text-white inline-block">
-                          Failed
-                      </div>
+                    ) : (
+                      <div className="py-2 px-4 rounded bg-red-500 text-white inline-block">Failed</div>
                     )}
                   </td>
                 </tr>
