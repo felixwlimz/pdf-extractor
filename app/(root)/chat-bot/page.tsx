@@ -1,6 +1,4 @@
 "use client";
-import ChatNav from "@/components/ChatNav";
-import ChatSidebar from "@/components/ChatSidebar";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import useLocalStorage from "@/hooks/use-local-storage";
@@ -57,10 +55,8 @@ const ChatBotPage = () => {
  
 
   return (
-    <>
-      <ChatSidebar chats={chats}/>
-      <section className="flex flex-col justify-between p-4 md:ml-[350px]">
-        <ChatNav />
+    
+      <div className="flex flex-col justify-between p-4 md:ml-4">
         <div
           className="flex flex-col p-4 gap-3 bg-gray-100 flex-1 overflow-y-auto"
           style={{ maxHeight: "calc(100vh - 200px)" }}
@@ -85,7 +81,7 @@ const ChatBotPage = () => {
             </div>
           ))}
         </div>
-        <div className="fixed bottom-0 top-[600px] max-md:w-[95%] w-[75%] p-2 flex gap-5 items-center">
+        <div className="fixed bottom-0 top-[600px] max-md:w-[95%] w-[80%] p-2 right-12 flex gap-5 items-center">
           <Button
             type="button"
             className="rounded-[50px] bg-green-400 hover:bg-green-600 p-2"
@@ -108,8 +104,7 @@ const ChatBotPage = () => {
             <Send />
           </Button>
         </div>
-      </section>
-    </>
+      </div>
   );
 };
 
