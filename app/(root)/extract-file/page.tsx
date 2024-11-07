@@ -311,7 +311,7 @@ const ExtractFiles = () => {
         )}
 
         {/* Render log messages */}
-        <div className="mt-4 w-full max-w-xl p-4 rounded">
+        <div className="mt-4 w-full max-w-xl p-4 rounded justify-centre">
           <ul>
             {logs.map((log, index) => (
               <li key={index} className="text-sm text-gray-700">
