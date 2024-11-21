@@ -1,16 +1,19 @@
 "use client";
-import { ChangeEvent, useState } from "react";
+import { ChangeEvent, useState, useEffect } from "react";
 import { Button } from "./ui/button";
 import { Input } from "./ui/input";
 import Spinner from "./Spinner";
 import useRobot from "@/hooks/use-robot";
 import { useToast } from "@/hooks/use-toast";
 const HeroPage = () => {
-
+  const [language, setLanguage] = useState('en'); // Default language
   const [selectedOption, setSelectedOption] = useState('');
   const { toast } = useToast();
-
-
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      setLanguage(window.navigator.language.slice(0, 2));
+    }
+  }, []);
   const handleSelectChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
       setSelectedOption(event.target.value);
       // Reset min and max words when the option changes
